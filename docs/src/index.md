@@ -1,6 +1,6 @@
 # SeaweedFSClient.jl
 
-Documentation for SeaweedFSClient.jl
+Some of these actions will throw exceptions via the HTTP client e.g. doing delete(f) on a deleted file
 
 ```@docs
 create
