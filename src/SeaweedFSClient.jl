@@ -52,25 +52,23 @@ julia> save(f, filedata("readme.txt", "This is some text"))
 save(f::NamedTuple, form::HTTP.Form) = save(f.host, f.url, f.fid, form)
 save(h::Host, url, fid, form::HTTP.Form) = @pipe HTTP.post("http://$url/$fid", [], form) |> decode_response(h,_)
 
-#==
-
+"""
+    load(f::NamedTuple, options=Dict{String,String}())::Vector{UInt8}
 load a file from the server
 # Arguments
 `f` is the response returned from `create` (or any tuple with (host=(hostname=String, port=Int), fid="V,FID", url="http..."))
-For some files the server will do actions. The documented one is width=W, height=H and `mode in ["fit", "fill"]` - perhaps more will follow
-
-
-==#
-
-"""
-    load(f::NamedTuple, options=Dict{String,String}())::Vector{UInt8}
-
+For some files the server will do actions. The documented one is width=W, height=H and `mode in ["fit", "fill"]` - perhaps more will follow    
 # Example
 ```
 # using a created f
 julia> load(f)
-17-element Vector{UInt8}: 0x54 0x68 ... 0x20 0x74
- ```
+17-element Vector{UInt8}:
+ 0x54
+ 0x68
+    ⋮
+ 0x20
+ 0x74
+```
 """
 function load(f::NamedTuple, options=Dict{String,String}())::Vector{UInt8}
     srv = server(f)
