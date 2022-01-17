@@ -4,7 +4,7 @@ using HTTP, JSON, Pipe
 
 # Write your package code here.
 
-export create, save, read, filedata, delete
+export create, save, load, filedata, delete
 
 const Host = NamedTuple{(:hostname, :port), Tuple{String, Int64}}
 
@@ -40,12 +40,13 @@ save(f::NamedTuple, form::HTTP.Form) = save(f.host, f.url, f.fid, form)
 save(h::Host, url, fid, form::HTTP.Form) = @pipe HTTP.post("http://$url/$fid", [], form) |> decode_response(h,_)
 
 """
-    read(f::NamedTuple, options=Dict{String,String}())::Vector{UInt8}
-read a file from the server
-Arguments
+    load(f::NamedTuple, options=Dict{String,String}())::Vector{UInt8}
+
+load a file from the server
+#Arguments
 For some files the server will do actions. The documented one is width=W, height=H and mode=fit|fill - perhaps more will follow
 """
-function read(f::NamedTuple, options=Dict{String,String}())
+function load(f::NamedTuple, options=Dict{String,String}())::Vector{UInt8}
     srv = server(f)
     if srv.status == 200
         url = srv.locations[1]["url"]

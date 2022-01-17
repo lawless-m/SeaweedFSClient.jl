@@ -15,7 +15,7 @@ save
 ```
 
 ```@docs
-read
+load
 ```
 
 ```@docs
