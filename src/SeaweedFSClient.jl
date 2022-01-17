@@ -42,7 +42,7 @@ save(h::Host, url, fid, form::HTTP.Form) = @pipe HTTP.post("http://$url/$fid", [
 """
     read(f::NamedTuple, options=Dict{String,String}())::Vector{UInt8}
 read a file from the server
-#Arguments
+Arguments
 For some files the server will do actions. The documented one is width=W, height=H and mode=fit|fill - perhaps more will follow
 """
 function read(f::NamedTuple, options=Dict{String,String}())
@@ -64,7 +64,7 @@ end
     delete(url, fid) 
     delete(f::NamedTuple) 
 
-Delete an file from the server
+Delete a file from the server
 """
 delete(url, fid) = HTTP.request("DELETE", "http://$url/$fid")
 delete(f::NamedTuple) = delete(f.url, f.fid)
