@@ -2,8 +2,6 @@ module SeaweedFSClient
 
 using HTTP, JSON, Pipe
 
-# Write your package code here.
-
 export create, save, load, filedata, delete
 
 const Host = NamedTuple{(:hostname, :port), Tuple{String, Int64}}
@@ -41,7 +39,7 @@ create(h::Host) = @pipe HTTP.request("GET", "http://$(h.hostname):$(h.port)/dir/
     save(h::Host, url, fid, file_data)
 # Arguments
 `f` is the response returned from `create` (or any tuple with (host=(hostname=String, port=Int), fid="V,FID", url="http..."))
-Send the file_data to the fid. file_data is created using `filedata()`
+Send the `file_data` to the fid. `file_data` is created using `filedata()`
 # Example
 ```
 # using a created f
