@@ -41,10 +41,12 @@ create(h::Host) = @pipe HTTP.request("GET", "http://$(h.hostname):$(h.port)/dir/
 `f` is the response returned from `create` (or any tuple with (host=(hostname=String, port=Int), fid="V,FID", url="http..."))
 Send the `file_data` to the fid. `file_data` is created using `filedata()`
 # Example
+
 ```
 # using a created f
 julia> save(f, filedata("readme.txt", "This is some text"))
 (host = (hostname = "localhost", port = 9333), status = 201, eTag = "0d79b2b0", size = 17)
+
 ```
 """
 save(f::NamedTuple, form::HTTP.Form) = save(f.host, f.url, f.fid, form)
@@ -55,7 +57,8 @@ save(h::Host, url, fid, form::HTTP.Form) = @pipe HTTP.post("http://$url/$fid", [
 load a file from the server
 # Arguments
 `f` is the response returned from `create` (or any tuple with (host=(hostname=String, port=Int), fid="V,FID", url="http..."))
-For some files the server will do actions. The documented one is width=W, height=H and mode=fit|fill - perhaps more will follow
+For some files the server will do actions. The documented one is width=W, height=H and `mode in ["fit", "fill"]`` - perhaps more will follow
+
 # Example
 ```
 # using a created f
