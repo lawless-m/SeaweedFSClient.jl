@@ -69,12 +69,7 @@ For some files the server will do actions. The documented one is width=W, height
 ```
 # using a created f
 julia> load(f)
-17-element Vector{UInt8}:
- 0x54
- 0x68
-    ⋮
- 0x20
- 0x74
+17-element Vector{UInt8}: 0x54 0x68 ... 0x20 0x74
  ```
 """
 function load(f::NamedTuple, options=Dict{String,String}())::Vector{UInt8}
