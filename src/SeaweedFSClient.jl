@@ -59,6 +59,7 @@ load a file from the server
 `f` is the response returned from `create` (or any tuple with (host=(hostname=String, port=Int), fid="V,FID", url="http..."))
 For some files the server will do actions. The documented one is width=W, height=H and mode=fit|fill - perhaps more will follow
 # Example
+```
 # using a created f
 julia> load(f)
 17-element Vector{UInt8}:
@@ -67,6 +68,7 @@ julia> load(f)
     ⋮
  0x20
  0x74
+ ```
 """
 function load(f::NamedTuple, options=Dict{String,String}())::Vector{UInt8}
     srv = server(f)
@@ -90,9 +92,11 @@ end
 `f` is the response returned from `create` (or any tuple with (host=(hostname=String, port=Int), fid="V,FID", url="http..."))
 Delete a file from the server
 # Example
+```
 # using a created f
 julia> delete(f)
 (host = nothing, status = 202, size = 29)
+```
 """
 delete(f::NamedTuple) = delete(f.url, f.fid)
 delete(url, fid) = @pipe HTTP.request("DELETE", "http://$url/$fid") |> decode_response(nothing, _)
@@ -103,9 +107,11 @@ delete(url, fid) = @pipe HTTP.request("DELETE", "http://$url/$fid") |> decode_re
 
 Create a file data object to send to the server
 # Example
+```
 # using a created f
 julia> save(f, filedata("/home/matt/readme.txt"))
 (host = (hostname = "localhost", port = 9333), status = 201, eTag = "04fd3fe2", name = "readme.txt", size = 29)
+```
 """
 filedata(filename, text) = HTTP.Form(Dict("text"=>text))
 filedata(filename::AbstractString) = filedata(filename, open(filename))
