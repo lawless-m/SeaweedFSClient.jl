@@ -61,8 +61,8 @@ function read(f::NamedTuple, options=Dict{String,String}())
 end
 
 """
-    delete(url, fid) = HTTP.request("DELETE", "http://$url/$fid")
-    delete(f::NamedTuple) = delete(f.url, f.fid)
+    delete(url, fid) 
+    delete(f::NamedTuple) 
 
 Delete an file from the server
 """
