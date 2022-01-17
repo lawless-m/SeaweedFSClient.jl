@@ -33,7 +33,6 @@ server(h::Host, v::AbstractString) = @pipe HTTP.request("GET", "http://$(h.hostn
 julia> f = create((hostname="localhost", port=9333))
 (host = (hostname = "localhost", port = 9333), status = 200, url = "192.168.1.9:8080", publicUrl = "192.168.1.9:8080", count = 1, fid = "3,09b8e10215"
 ```
-
 """
 create(h::Host) = @pipe HTTP.request("GET", "http://$(h.hostname):$(h.port)/dir/assign") |> decode_response(h,_)
 
@@ -48,6 +47,7 @@ Send the file_data to the fid. file_data is created using `filedata()`
 # using a created f
 julia> save(f, filedata("readme.txt", "This is some text"))
 (host = (hostname = "localhost", port = 9333), status = 201, eTag = "0d79b2b0", size = 17)
+```
 """
 save(f::NamedTuple, form::HTTP.Form) = save(f.host, f.url, f.fid, form)
 save(h::Host, url, fid, form::HTTP.Form) = @pipe HTTP.post("http://$url/$fid", [], form) |> decode_response(h,_)
