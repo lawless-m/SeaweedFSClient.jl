@@ -57,7 +57,7 @@ save(h::Host, url, fid, form::HTTP.Form) = @pipe HTTP.post("http://$url/$fid", [
 load a file from the server
 # Arguments
 `f` is the response returned from `create` (or any tuple with (host=(hostname=String, port=Int), fid="V,FID", url="http..."))
-For some files the server will do actions. The documented one is width=W, height=H and `mode in ["fit", "fill"]`` - perhaps more will follow
+For some files the server will do actions. The documented one is width=W, height=H and `mode in ["fit", "fill"]` - perhaps more will follow
 
 # Example
 ```
