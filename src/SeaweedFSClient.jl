@@ -25,7 +25,7 @@ server(h::Host, v::AbstractString) = @pipe HTTP.request("GET", "http://$(h.hostn
 """
     create(h::Host)
 # Arguments
-`h` an instance of NamedTuple{(:hostname, :port), Tuple{String, Int64}}
+- `h` an instance of NamedTuple{(:hostname, :port), Tuple{String, Int64}}
 # Example
 ```
 julia> f = create((hostname="localhost", port=9333))
@@ -38,7 +38,7 @@ create(h::Host) = @pipe HTTP.request("GET", "http://$(h.hostname):$(h.port)/dir/
     save(f::NamedTuple, file_data)
     save(h::Host, url, fid, file_data)
 # Arguments
-`f` is the response returned from `create` (or any tuple with (host=(hostname=String, port=Int), fid="V,FID", url="http..."))
+- `f` is the response returned from `create` (or any tuple with (host=(hostname=String, port=Int), fid="V,FID", url="http..."))
 Send the `file_data` to the fid. `file_data` is created using `filedata()`
 # Example
 
@@ -53,10 +53,12 @@ save(f::NamedTuple, form::HTTP.Form) = save(f.host, f.url, f.fid, form)
 save(h::Host, url, fid, form::HTTP.Form) = @pipe HTTP.post("http://$url/$fid", [], form) |> decode_response(h,_)
 
 """
-    load(f::NamedTuple, options=Dict{String,String}())::Vector{UInt8}
+    load(f::NamedTuple, options=Dict{String,String}())::Union{Nothing, Vector{UInt8}}
+    load(f::NamedTuple, options=Dict{String,String}(); range=0:0)::Union{Nothing, Vector{UInt8}}
 load a file from the server
 # Arguments
-`f` is the response returned from `create` (or any tuple with (host=(hostname=String, port=Int), fid="V,FID", url="http..."))
+- `f` is the response returned from `create` (or any tuple with (host=(hostname=String, port=Int), fid="V,FID", url="http..."))
+- `range` optional byte range instead of the whole file
 For some files the server will do actions. The documented one is width=W, height=H and `mode in ["fit", "fill"]` - perhaps more will follow    
 # Example
 ```
@@ -70,16 +72,20 @@ julia> load(f)
  0x74
 ```
 """
-function load(f::NamedTuple, options=Dict{String,String}())::Vector{UInt8}
+function load(f::NamedTuple, options=Dict{String,String}(); range=0:0)
     srv = server(f)
     if srv.status == 200
+        headers = Dict{String, String}()
         url = srv.locations[1]["url"]
         qs = ""
         if haskey(options, "width") && haskey(options, "height")
             qs = """?width=$(options["width"])&height=$(options["height"])&mode=$(get(options, "mode", ""))"""
         end
-        r = HTTP.request("GET", "http://$(url)/$(f.fid)$qs")
-        if r.status == 200
+        if range != 0:0
+            headers["Range"] = "bytes=$(range[1])-$(range[end])"
+        end
+        r = HTTP.request("GET", "http://$(url)/$(f.fid)$qs", headers)
+        if 200 <= r.status < 300
             return r.body
         end
     end
@@ -89,7 +95,7 @@ end
     delete(f::NamedTuple) 
     delete(url, fid) 
 # Arguments
-`f` is the response returned from `create` (or any tuple with (host=(hostname=String, port=Int), fid="V,FID", url="http..."))
+- `f` is the response returned from `create` (or any tuple with (host=(hostname=String, port=Int), fid="V,FID", url="http..."))
 Delete a file from the server
 # Example
 ```
@@ -100,23 +106,20 @@ julia> delete(f)
 """
 delete(f::NamedTuple) = delete(f.url, f.fid)
 delete(url, fid) = @pipe HTTP.request("DELETE", "http://$url/$fid") |> decode_response(nothing, _)
-"""
-    filedata(filename, text)
-    filedata(filename::AbstractString)
-    filedata(filename::AbstractString, io::IO)
 
-Create a file data object to send to the server
+"""
+    filedata(text)
+    filedata(io::IO)
+Create a file data object to send to the server.
 # Example
 ```
 # using a created f
-julia> save(f, filedata("/home/matt/readme.txt"))
+julia> open("/home/matt/some_readme.txt") do io save(f, filedata(io, "readme.txt")) end
 (host = (hostname = "localhost", port = 9333), status = 201, eTag = "04fd3fe2", name = "readme.txt", size = 29)
 ```
 """
-filedata(filename, text) = HTTP.Form(Dict("text"=>text))
-filedata(filename::AbstractString) = filedata(filename, open(filename))
-filedata(filename::AbstractString, io::IO) = HTTP.Form(Dict("key" => HTTP.Multipart(filename, io, HTTP.sniff(io)),))
-
+filedata(text) = HTTP.Form(Dict("text"=>text))
+filedata(io::IO, filename="filename") = HTTP.Form(Dict("key" => HTTP.Multipart(filename, io, HTTP.sniff(io)),))
 
 ###
 end
